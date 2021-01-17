@@ -56,7 +56,7 @@ export default function Login() {
   const onFinish=(values)=>{     
     // console.log('Received values of form: ', values);
     // if(loginCheck(values)){
-        if(values.role===undefined||values.role==="Student"){
+        if(values.role==="Student"){
         router.push("/dashboard/student")
       } else if (values.role==="Teacher"){
         router.push("/dashboard/teacher")
