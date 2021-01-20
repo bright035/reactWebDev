@@ -15,19 +15,19 @@ import {
 import "antd/dist/antd.css"
 import { createServer } from "miragejs"
 
-// createServer({
-//   routes() {
-//     this.namespace = "/api"
-//     this.get(
-//         "/loginCheck", 
-//           () => [
-//             { id: "1", role: "Student", email: "ling@126.com", password: "123456" },
-//             { id: "2", role: "Teacher", email: "ling@126.com", password: "123456" },
-//             { id: "3", role: "Manager", email: "ling@126.com", password: "123456" },
-        
-//     ])
-//   },
-// })
+  // createServer({
+  //   routes() {
+  //     this.namespace = "/api"
+  //     this.get(
+  //         "/login", 
+  //           () => [
+  //             { id: "1", role: "Student", email: "ling@126.com", password: "123456" },
+  //             { id: "2", role: "Teacher", email: "ling@126.com", password: "123456" },
+  //             { id: "3", role: "Manager", email: "ling@126.com", password: "123456" },
+          
+  //     ])
+  //   },
+  // })
 
 export default function Login() {
   let [users, setUsers] = useState([])
@@ -35,11 +35,14 @@ export default function Login() {
   const [radioValue, setRadioValue] = useState("Student");
   const router= useRouter()
 
+
+
   // useEffect(() => {
-  //     fetch("/api/loginCheck")
+  //     fetch("/api/login")
   //       .then((response) => response.json())
   //       .then((json) => setUsers(json))
   //   }, [])
+  
 
   // const loginCheck=(values)=>{
   //    users.map((user) => {
@@ -50,26 +53,27 @@ export default function Login() {
   //          counter = true;
   //        }
   //    })
-  //   return counter
+  //   return !counter
   // }
+
   
   const onFinish=(values)=>{     
-    // console.log('Received values of form: ', values);
+    console.log('Received values of form: ', values);
     // if(loginCheck(values)){
         if(values.role==="Student"){
-        router.push("/dashboard/student")
-      } else if (values.role==="Teacher"){
-        router.push("/dashboard/teacher")
-      } else if (values.role==="Manager"){
-        router.push("/dashboard/manager")
-      }
+          router.push("/dashboard/student")
+        } else if (values.role==="Teacher"){
+          router.push("/dashboard/teacher")
+        } else if (values.role==="Manager"){
+          router.push("/dashboard/manager")
+        }
     // }
     
   }
 
     return (
      <Row justify='center'>
-         <Col md={8} sd={16}>
+         <Col md={8} sm={16}>
 
             <Form
                 layout="vertical"
