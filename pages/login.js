@@ -13,60 +13,33 @@ import {
   Radio 
 } from "antd"
 import "antd/dist/antd.css"
-import { createServer } from "miragejs"
+import {axiosPost} from './lib/sevice'
 
-  // createServer({
-  //   routes() {
-  //     this.namespace = "/api"
-  //     this.get(
-  //         "/login", 
-  //           () => [
-  //             { id: "1", role: "Student", email: "ling@126.com", password: "123456" },
-  //             { id: "2", role: "Teacher", email: "ling@126.com", password: "123456" },
-  //             { id: "3", role: "Manager", email: "ling@126.com", password: "123456" },
-          
-  //     ])
-  //   },
-  // })
+
 
 export default function Login() {
   let [users, setUsers] = useState([])
+  let [response, setResponse] = useState({})
   let counter = false
   const [radioValue, setRadioValue] = useState("Student");
   const router= useRouter()
-
-
-
-  // useEffect(() => {
-  //     fetch("/api/login")
-  //       .then((response) => response.json())
-  //       .then((json) => setUsers(json))
-  //   }, [])
   
-
-  // const loginCheck=(values)=>{
-  //    users.map((user) => {
-  //      if(
-  //        values.role===user.role
-  //        &&values.email===user.email
-  //        &&values.password===user.password){
-  //          counter = true;
-  //        }
-  //    })
-  //   return !counter
-  // }
-
-  
-  const onFinish=(values)=>{     
-    console.log('Received values of form: ', values);
+  const onFinish= async (values)=>{
+    //同步问题没有解决,刷新后第一次的hook值undefined     
+    const res= await axiosPost(values)
+                .then((res)=>{setResponse(res.data);
+                              setTimeout(1000)
+                            })
+                .catch((err)=>console.log(err.message))
+    console.log(response.data)
     // if(loginCheck(values)){
-        if(values.role==="Student"){
-          router.push("/dashboard/student")
-        } else if (values.role==="Teacher"){
-          router.push("/dashboard/teacher")
-        } else if (values.role==="Manager"){
-          router.push("/dashboard/manager")
-        }
+        // if(values.role==="Student"){
+        //   router.push("/dashboard/student")
+        // } else if (values.role==="Teacher"){
+        //   router.push("/dashboard/teacher")
+        // } else if (values.role==="Manager"){
+        //   router.push("/dashboard/manager")
+        // }
     // }
     
   }
