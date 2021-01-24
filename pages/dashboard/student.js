@@ -19,11 +19,21 @@ import {axiosGetStudentByID} from '../lib/sevice'
 import { axiosInstance } from '../lib/constant'
 
 const { Search } = Input;
-const data = {}
+const data = [
+  {
+    name: 'student',
+    area: 'China',
+    email: 'student@admin.com',
+    courses: 'Math',
+    typeName: 'Full time',
+    ctime: '21/01/2021',
+  },
+]
 const columns=[
   {
     title:'No.',
     key: 'index',
+    render: (_1, _2, index) => index + 1,
   },
   {
     title:'Name',
