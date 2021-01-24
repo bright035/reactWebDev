@@ -3,91 +3,84 @@ import Link from 'next/link'
 import styles from '../../styles/Home.module.css'
 import React, {useState} from 'react'
 import ReactDOM from 'react-dom'
-import { Layout, Menu, Dropdown } from 'antd';
+import { Layout, Menu, Dropdown,Space, Input, Table } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   UserOutlined,
   VideoCameraOutlined,
   UploadOutlined,
-  ExportOutlined
+  ExportOutlined,
+  AudioOutlined 
 } from '@ant-design/icons';
 import "antd/dist/antd.css"
+import AppLayout from '../lib/component/layout'
+import {axiosGetStudentByID} from '../lib/sevice'
+import { axiosInstance } from '../lib/constant'
 
-
-const { Header, Sider, Content } = Layout;
-const { SubMenu } = Menu;
+const { Search } = Input;
+const data = {}
+const columns=[
+  {
+    title:'No.',
+    key: 'index',
+  },
+  {
+    title:'Name',
+    dataIndex: 'name',
+  },
+  {
+    title: 'Area',
+    dataIndex: 'area',
+  },
+  {
+    title: 'Email',
+    dataIndex: 'email',
+  },
+  {
+    title:'Selected Curriculum',
+    dataIndex: 'courses',
+  },
+  {
+    title: 'Student type',
+    dataIndex: 'typeName',
+  },
+  {
+    title: 'Join time',
+    dataIndex: 'ctime',
+  },
+  {
+    title: 'Action',
+    dataIndex: 'action',
+  },
+];
+const onSearch = value => console.log(value);
+const studentData= async ()=>{
+  let page=0
+  let limit=10
+  let response
+  const ans = await axiosGetStudentByID(page)
+                .then((res)=>{response=res})
+                .catch((err)=>console.log(err.message))
+  console.log(response.data)
+  return true
+}
 
 export default function Student() {
-  let [collapsed, setCollapsed] = useState(false)
-  let [subCollapsed, setSubcollapsed] = useState(false)
-  const menu = (
-    <Menu>
-      <Menu.Item>
-        <a  href="/login">
-          Logout
-        </a>
-      </Menu.Item>
-    </Menu>
-  );
-
-  const toggle = () => {
-    setCollapsed(!collapsed)
-  };
-  const toggleCollapsed = () => {
-    setSubcollapsed(!subCollapsed)
-  };
-
     return (
-      <Layout style={{minHeight:"100vh"}}>
-        <Sider id="siderTrigger" trigger={null} collapsible collapsed={collapsed}>
-          <div className="logo" >CMS</div>
-          <Menu 
-            defaultSelectedKeys={['1']}
-            //defaultOpenKeys={['sub1']}
-            mode="inline"
-            theme="dark"
-            collapsed={""+subCollapsed} 
-          >
-            <Menu.Item key="1" icon={<UserOutlined />}>
-              Overview
-            </Menu.Item>
-            <SubMenu key="sub1" icon={<VideoCameraOutlined />} title="Student">
-              <Menu.Item key="2">
-                Student List
-              </Menu.Item>
-            </SubMenu>
-            <Menu.Item key="3" icon={<UploadOutlined />}>
-              Teacher
-            </Menu.Item>
-          </Menu>
-        </Sider>
-        <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }}>
-            {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-              className: 'trigger',
-              onClick: toggle,
-            })}
-            <div className="trigger1" onClick={toggle}>
-              <Dropdown overlay={menu}>
-                <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                  <ExportOutlined />
-                </a>
-              </Dropdown>
-            </div>
-          </Header>
-          <Content
-            className="site-layout-background"
-            style={{
-              margin: '24px 16px',
-              padding: 24,
-              minHeight: 280,
-            }}
-          >
-            Content
-          </Content>
-        </Layout>
-      </Layout>
+      <AppLayout>
+        <p>Contents</p>
+      
+        <Space direction="vertical">
+          <Search placeholder="input search text" onSearch={onSearch} enterButton />
+        </Space>
+        
+        <Table
+          rowKey="id"
+          dataSource={data}
+          columns={columns}
+        ></Table>
+      </AppLayout>
     );
 }
 

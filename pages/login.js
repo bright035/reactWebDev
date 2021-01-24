@@ -18,29 +18,24 @@ import {axiosPost} from './lib/sevice'
 
 
 export default function Login() {
-  let [users, setUsers] = useState([])
-  let [response, setResponse] = useState({})
-  let counter = false
-  const [radioValue, setRadioValue] = useState("Student");
   const router= useRouter()
   
   const onFinish= async (values)=>{
-    //同步问题没有解决,刷新后第一次的hook值undefined     
+    //使用hook的时候第一次取值undefined
+    let response    
     const res= await axiosPost(values)
-                .then((res)=>{setResponse(res.data);
-                              setTimeout(1000)
-                            })
+                .then((res)=>{response=res})
                 .catch((err)=>console.log(err.message))
     console.log(response.data)
-    // if(loginCheck(values)){
-        // if(values.role==="Student"){
-        //   router.push("/dashboard/student")
-        // } else if (values.role==="Teacher"){
-        //   router.push("/dashboard/teacher")
-        // } else if (values.role==="Manager"){
-        //   router.push("/dashboard/manager")
-        // }
-    // }
+     if(2<=response.data.code<=3){
+        if(values.role==="student"){
+          router.push("/dashboard/student")
+        } else if (values.role==="teacher"){
+          router.push("/dashboard/teacher")
+        } else if (values.role==="manager"){
+          router.push("/dashboard/manager")
+        }
+    }
     
   }
 
@@ -59,12 +54,12 @@ export default function Login() {
 
               <Form.Item
                 name="role"
-                initialValue="Student"
+                initialValue="student"
               >
                    <Radio.Group> 
-                      <Radio.Button value="Student">Student</Radio.Button>
-                      <Radio.Button value="Teacher">Teacher</Radio.Button>
-                      <Radio.Button value="Manager">Manager</Radio.Button>
+                      <Radio.Button value="student">Student</Radio.Button>
+                      <Radio.Button value="teacher">Teacher</Radio.Button>
+                      <Radio.Button value="manager">Manager</Radio.Button>
                   </Radio.Group>
               </Form.Item>
 
@@ -106,7 +101,7 @@ export default function Login() {
               </Form.Item>
 
               <Form.Item  
-                name="check"
+                name="remember"
                 valuePropName="checked"
               >
                   <Checkbox>记住我</Checkbox>
