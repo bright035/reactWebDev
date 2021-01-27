@@ -1,1 +1,1 @@
-export {axiosPost,axiosGetStudentByID} from './api-service'
+export {axiosPost,axiosGetStudentsByPage} from './api-service'

@@ -61,3 +61,8 @@ a {
 .site-layout .site-layout-background {
   background: #fff;
 }
+
+#studentSearch{
+  float: right;
+  width: 30%;
+}

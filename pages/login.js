@@ -21,21 +21,24 @@ export default function Login() {
   const router= useRouter()
   
   const onFinish= async (values)=>{
-    //使用hook的时候第一次取值undefined
-    let response    
-    const res= await axiosPost(values)
-                .then((res)=>{response=res})
-                .catch((err)=>console.log(err.message))
-    console.log(response.data)
-     if(2<=response.data.code<=3){
-        if(values.role==="student"){
-          router.push("/dashboard/student")
-        } else if (values.role==="teacher"){
-          router.push("/dashboard/teacher")
-        } else if (values.role==="manager"){
-          router.push("/dashboard/manager")
-        }
+    try{
+      const res= await axiosPost(values)
+      // console.log(res)
+      if(200<=res.status&&res.status<300){
+          localStorage.setItem('token',res.data.data.token)
+          if(values.role==="student"){
+            router.push("/dashboard/student")
+          } else if (values.role==="teacher"){
+            router.push("/dashboard/teacher")
+          } else if (values.role==="manager"){
+            router.push("/dashboard/manager")
+          }
+      }
+    } catch(e) {
+      console.log(e.message)
     }
+    
+    
     
   }
 

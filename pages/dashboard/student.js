@@ -15,7 +15,7 @@ import {
 } from '@ant-design/icons';
 import "antd/dist/antd.css"
 import AppLayout from '../lib/component/layout'
-import {axiosGetStudentByID} from '../lib/sevice'
+import {axiosGetStudentsByPage} from '../lib/sevice'
 import { axiosInstance } from '../lib/constant'
 
 const { Search } = Input;
@@ -69,14 +69,21 @@ const studentData= async ()=>{
   let page=0
   let limit=10
   let response
-  const ans = await axiosGetStudentByID(page)
-                .then((res)=>{response=res})
-                .catch((err)=>console.log(err.message))
-  console.log(response.data)
+  const ans = await axiosGetStudentsByPage(page,limit)
+                
+  console.log(ans)
   return true
 }
 
 export default function Student() {
+    // 初始化data数据
+    // 声明data钩子
+    // 取回数据
+    // 
+    useEffect(() => {
+      studentData()
+      
+    }, [])
     return (
       <AppLayout>
         <p>Contents</p>

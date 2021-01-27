@@ -11,7 +11,8 @@ export const axiosPost = async (values)=>{
     }))
   }
 
-export const axiosGetStudentByID = async (uid) =>{
+export const axiosGetStudentsByPage = async (page,limit) =>{
     return (
-        await axiosInstanceAuthen.get('/courses?uid='+uid))
+        await axiosInstanceAuthen.get(`/students?page=${page}&limit=${limit}`)
+        )
 }
