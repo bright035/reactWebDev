@@ -1,8 +1,8 @@
-import Head from 'next/head'
-import Link from 'next/link'
-import {useRouter} from 'next/router'
-import styles from '../styles/Home.module.css'
-import React, { useState, useEffect } from 'react'
+import Head from 'next/head';
+import Link from 'next/link';
+import {useRouter} from 'next/router';
+import styles from '../styles/Home.module.css';
+import React from 'react';
 import { 
   Row,
   Col,
@@ -10,54 +10,56 @@ import {
   Input, 
   Checkbox, 
   Button, 
-  Radio 
-} from "antd"
-import "antd/dist/antd.css"
-import {axiosPost} from './lib/sevice'
+  Radio,
+  Typography,
+  message 
+} from "antd";
+import "antd/dist/antd.css";
+import {axiosPost} from './lib/service';
 
-
+const {Title} = Typography;
 
 export default function Login() {
-  const router= useRouter()
+  const router = useRouter();
   
   const onFinish= async (values)=>{
     try{
-      const res= await axiosPost(values)
-      // console.log(res)
+      const res= await axiosPost(values);
       if(200<=res.status&&res.status<300){
-          localStorage.setItem('token',res.data.data.token)
+          localStorage.setItem('loginData',JSON.stringify(res.data.data))
           if(values.role==="student"){
             router.push("/dashboard/student")
           } else if (values.role==="teacher"){
             router.push("/dashboard/teacher")
           } else if (values.role==="manager"){
             router.push("/dashboard/manager")
-          }
-      }
+          };
+      };
     } catch(e) {
-      console.log(e.message)
-    }
+      message.info(e.message);
+    };
     
     
     
-  }
+  };
 
     return (
+    
      <Row justify='center'>
          <Col md={8} sm={16}>
 
             <Form
                 layout="vertical"
+                initialValues={{"role":"manager"}}
                 onFinish={onFinish}
             >
 
               <Form.Item>
-                  <p id="formHeader">课程管理助手</p>
+                  <Title id="formHeader" level={4}>课程管理助手</Title>
               </Form.Item>
 
               <Form.Item
                 name="role"
-                initialValue="student"
               >
                    <Radio.Group> 
                       <Radio.Button value="student">Student</Radio.Button>
@@ -122,5 +124,5 @@ export default function Login() {
             </Form>
          </Col>
      </Row>
-    )
-  }
+    );
+  };

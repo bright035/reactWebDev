@@ -1,6 +1,6 @@
 
 import React, {useState} from 'react'
-import { Layout, Menu, Dropdown } from 'antd';
+import { Layout, Menu, Dropdown, message } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -10,18 +10,31 @@ import {
   ExportOutlined
 } from '@ant-design/icons';
 import "antd/dist/antd.css"
+import {axiosPostLogout} from '../../lib/service';
+import {useRouter} from 'next/router';
 
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
 
 export default function AppLayout(props) {
+  const router = useRouter();
   let [collapsed, setCollapsed] = useState(false)
   let [subCollapsed, setSubcollapsed] = useState(false)
+  const logout = () => {
+      axiosPostLogout().then((res) => {
+          localStorage.removeItem('loginData');
+          router.push('/login')
+        }
+      ).catch((e) => {
+        message.info(e.message);
+      });
+      
+  };
   const menu = (
     <Menu>
       <Menu.Item>
-        <a  href="/login">
+        <a  href="#" onClick={logout}>
           Logout
         </a>
       </Menu.Item>
