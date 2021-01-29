@@ -1,41 +1,37 @@
 import Head from 'next/head';
-import Link from 'next/link';
 import styles from '../../styles/Home.module.css';
 import React, {useState,useEffect} from 'react';
-import ReactDOM from 'react-dom';
-import {Select,Form,Input, Table, Button, Modal, message, Space} from 'antd';
+import {Select,Form,Input, Table, Button, Modal, message, Space, Typography} from 'antd';
 import {
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-  ExportOutlined,
-  AudioOutlined,
   PlusOutlined 
 } from '@ant-design/icons';
 import "antd/dist/antd.css";
-import AppLayout from '../lib/component/layout';
-import {axiosGetStudentsByPageAndQuery,axiosPostStudents} from '../lib/service';
-import {useRouter} from 'next/router';
-import _, {debounce} from 'lodash';
+import AppLayout from '../../lib/component/layout';
+import {axiosGetStudentsByPageAndQuery,axiosPostStudents,axiosGetCountries} from '../../lib/service';
+import _ from 'lodash';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 
-const { Search } = Input;
-
+const {Search} = Input;
+const {Link} = Typography;
 
 export default function Manager() {
     const [form] = Form.useForm();
-    const [visible, setVisible] = React.useState(false);
-    const [confirmLoading, setConfirmLoading] = React.useState(false);
+    const [visible, setVisible] = useState(false);
 
-    const [data, setData] = useState([]);
-    const [pagination, setPagination] = useState({
+    const [studentData, setStudentData] = useState([]);
+    const [paginationConfig, setPagination] = useState({
                                           current: 1,
                                           pageSize: 10,
                                           total: 10
                                       });
-    const [search, setSearch] = useState("");
-    const columns=[
+
+    const [searchInput, setSearch] = useState("");
+    
+    const [version, setVersion] = useState("1.02");
+
+    const [countries, setCountries] = useState(["China","Australia"]);
+                                      
+    const columns = [
       {
         title:'No.',
         key: 'index',
@@ -44,83 +40,120 @@ export default function Manager() {
       {
         title:'Name',
         dataIndex: 'name',
+        width: "15%",
+        render: (name,student) => {
+          return (
+            <Link href={`./student/${student.id}`}>{name}</Link>
+          )
+        },
+        sorter: (a,b) => (a.name.charCodeAt(0)-b.name.charCodeAt(0))
       },
       {
         title: 'Area',
-            dataIndex: 'country',
-          },
-          {
-            title: 'Email',
-            dataIndex: 'email',
-          },
-          {
-            title:'Selected Curriculum',
-            dataIndex:'courses',
-            render:(courses)=>
-            courses.map((subItem)=> subItem.name).toString()  
-          },
-          {
-            title: 'Student type',
-            dataIndex: 'type',
-            render:(type)=>type.name
-            
-          },
-          {
-            title: 'Join time',
-            dataIndex: 'createdAt',
-          },
-          {
-            title: 'Action',
-            dataIndex: 'action',
-          },
+        dataIndex: 'country',
+      },
+      {
+        title: 'Email',
+        dataIndex: 'email',
+      },
+      {
+        title:'Selected Curriculum',
+        dataIndex:'courses',
+        render:(courses) =>
+        courses.map((subItem) => subItem.name).join(", ") 
+      },
+      {
+        title: 'Student type',
+        dataIndex: 'type',
+        width: "15%",
+        filters:[
+          { text: "tester",
+            value: "tester"},
+          { text: "developer",
+            value: "developer"}
+        ],
+        onFilter: (value,record) => record.type.name==value,
+        render: (type) => type?.name
+        // render:(type)=>!!type&&type.hasOwnProperty('name')?type.name:""
+      },
+      {
+        title: 'Join time',
+        dataIndex: 'createdAt',
+        render: (createdAt) => formatDistanceToNow(new Date(createdAt), {includeSeconds: true, addSuffix: true})
+      },
+      {
+        title: 'Action',
+        dataIndex: 'action',
+        render: () => {
+          return (
+                <>
+                <Space>
+                  <Link>Add</Link>
+                  <Link>Delete</Link>
+                </Space>
+                
+                </>
+              )
+        }
+      },
     ];
 
     useEffect(() => {
-      axiosGetStudentsByPageAndQuery(search,pagination.current,pagination.pageSize).then((res) => {
+      axiosGetStudentsByPageAndQuery(searchInput,paginationConfig.current,paginationConfig.pageSize).then((res) => {
         const students = res.data.data.students;
         // console.log(res.data.data);
-        setData(students);
+        setStudentData(students);
         setPagination({
-          ...pagination,
+          ...paginationConfig,
           total: res.data.data.total
         });
-        // console.log(pagination)
+        // console.log(paginationConfig)
       }).catch(e => message.info(e.message));
-    }, [pagination.current, search])
+    }, [paginationConfig.current, searchInput]);
     
-    
+    useEffect(() => {
+      axiosGetCountries().then((res) => {
+        const countryList = res.data.data.map((country) => {
+          return country?.en
+          // return !!country&&country.hasOwnProperty('en')? country.en:""
+          });
+        localStorage?.setItem('CountryList',JSON.stringify(countryList)); 
+      }
+      )
+    }, [version]);
 
     const onChange1 = page => {
       setPagination({
-        ...pagination,
+        ...paginationConfig,
         current: page
       });
     };
     
     const onInputSearch = event => {
-      setSearch(event.target.value)
       setPagination(
         {
-          ...pagination,
+          ...paginationConfig,
           current: 1
         }
-      )
+      );
+      setSearch(event.target.value);
     };
     const onSearch = value => {
-      setSearch(value)
       setPagination(
         {
-          ...pagination,
+          ...paginationConfig,
           current: 1
         }
-      )
+      );
+      setSearch(value);
     };
 
     const showModal = () => {
+      setCountries(JSON.parse(localStorage.getItem("CountryList")));
       setVisible(true);
     };
 
-    const modalFinish=(value) => {
+    const modalFinish = (value) => {
       axiosPostStudents(value.name,value.country,value.email,value.type).then((res) => {
           setVisible(false);
           message.info("New student created");
@@ -130,7 +163,6 @@ export default function Manager() {
         message.info(e.message);
       })
     };
-    const router= useRouter();
     
     return (
       <AppLayout>
@@ -155,23 +187,22 @@ export default function Manager() {
         <Table
           pagination={
             {
-              current: pagination.current,
-              pageSize: pagination.pageSize,
-              total: pagination.total,
+              current: paginationConfig.current,
+              pageSize: paginationConfig.pageSize,
+              total: paginationConfig.total,
               responsive: true,
               showSizeChanger: false,
               onChange: (page) => onChange1(page)
             }
           }
           rowKey="id"
-          dataSource={data}
+          dataSource={studentData}
           columns={columns}
         ></Table>
         <Modal
           destroyOnClose={true}
           closable={false}
           visible={visible}
-          confirmLoading={confirmLoading}
           footer={null}
         >
           <div>
@@ -213,12 +244,11 @@ export default function Manager() {
               name="country" 
               rules={[{ required: true }]}>
               <Select>
-                  <Select.Option value={'1'} key={'1'}>
-                    China
-                  </Select.Option>
-                  <Select.Option value={'2'} key={'2'}>
-                    Japan
-                  </Select.Option>
+                  {countries?.map((country,index) => (
+                    <Select.Option value={country} key={index}>
+                      {country}
+                    </Select.Option>
+                  ))}
               </Select>
             </Form.Item>
 

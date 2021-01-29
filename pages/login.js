@@ -15,17 +15,18 @@ import {
   message 
 } from "antd";
 import "antd/dist/antd.css";
-import {axiosPost} from './lib/service';
+import {axiosPost} from './../lib/service';
+import {isHttpSuccess} from '../lib/service'
 
 const {Title} = Typography;
 
 export default function Login() {
   const router = useRouter();
   
-  const onFinish= async (values)=>{
+  const onFinish = async (values) => {
     try{
-      const res= await axiosPost(values);
-      if(200<=res.status&&res.status<300){
+      const res = await axiosPost(values);
+      if(isHttpSuccess){
           localStorage.setItem('loginData',JSON.stringify(res.data.data))
           if(values.role==="student"){
             router.push("/dashboard/student")

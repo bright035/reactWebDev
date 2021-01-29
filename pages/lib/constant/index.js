@@ -1,1 +1,0 @@
-export {axiosInstance, axiosInstanceAuthen} from './axios'
